@@ -16,8 +16,8 @@ namespace TimeTracking_Api.Controllers
 
                 sqlConnection.Open();
                 SqlCommand cmd = sqlConnection.CreateCommand();
-                cmd.CommandText = $"Insert into Users(id,created_date_time,email,first_name,last_name,role_id,updated_date_time,name) values " +
-                    $"({user.Id},'{user.CreatedDateTime}','{user.Email}','{user.FirstName}','{user.LastName}','{user.Roleid}','{user.UpdatedDateTime}','{user.Name}') ";
+                cmd.CommandText = $"Insert into users values " +
+                    $"('{user.CreatedDateTime}','{user.Email}','{user.FirstName}','{user.LastName}','{user.Roleid}','{user.UpdatedDateTime}','{user.Name}') ";
                 var result = cmd.ExecuteNonQuery();
                 return result;
             }
@@ -37,7 +37,7 @@ namespace TimeTracking_Api.Controllers
                 sqlConnection.ConnectionString = DatabaseConnectionString;
                 sqlConnection.Open();
                 SqlCommand sqlCommand = sqlConnection.CreateCommand();
-                sqlCommand.CommandText = $"select * from Users where id={id}";
+                sqlCommand.CommandText = $"select * from users where id={id}";
 
                 SqlDataReader result = sqlCommand.ExecuteReader();
                 List<User> users = new List<User>();
@@ -49,7 +49,7 @@ namespace TimeTracking_Api.Controllers
                     user.Email = result.GetString(2);
                     user.FirstName = result.GetString(3);
                     user.LastName = result.GetString(4);
-                    user.Roleid = result.GetString(5);
+                    user.Roleid = result.GetInt32(5);
                     user.UpdatedDateTime = result.GetDateTime(6);
                     user.Name = result.GetString(7);
 
@@ -82,9 +82,9 @@ namespace TimeTracking_Api.Controllers
                     $"updated_date_time='{user.UpdatedDateTime}'," +
                     $"name='{user.Name}'" +
                     $" where id={user.Id}";
-             
+
                 var upddatedRecordCount = sqlCommand.ExecuteNonQuery();
-               return upddatedRecordCount;
+                return upddatedRecordCount;
             }
             catch (Exception ex)
             {
@@ -118,17 +118,15 @@ namespace TimeTracking_Api.Controllers
 
                 sqlConnection.Open();
                 SqlCommand cmd = sqlConnection.CreateCommand();
-                cmd.CommandText = $"Insert into Login(login_id,password,username,is_active) values " +
-                    $"(10,'{login.Password}','{login.UserName}','{login.IsActive}') ";
+                cmd.CommandText = $"Insert into login values" +
+                    $"('{login.Password}','{login.UserName}','{login.IsActive}')";
                 var result = cmd.ExecuteNonQuery();
                 return result;
             }
             catch (Exception exception)
             {
-
                 return -1;
             }
-
         }
         public List<Login> GetLoginUser(int loginid)
         {
@@ -138,7 +136,7 @@ namespace TimeTracking_Api.Controllers
                 sqlConnection.ConnectionString = DatabaseConnectionString;
                 sqlConnection.Open();
                 SqlCommand sqlCommand = sqlConnection.CreateCommand();
-                sqlCommand.CommandText = $"select * from Login where login_id={loginid}";
+                sqlCommand.CommandText = $"select * from login where login_id={loginid}";
                 SqlDataReader result = sqlCommand.ExecuteReader();
                 List<Login> loginusers = new List<Login>();
                 while (result.Read())
@@ -196,6 +194,115 @@ namespace TimeTracking_Api.Controllers
                 return 0;
             }
         }
-    }
+        public int CreateRole(Role role)
+        {
+            try
+            {
+                SqlConnection sqlConnection = new SqlConnection();
+                sqlConnection.ConnectionString = DatabaseConnectionString;
+                sqlConnection.Open();
+                SqlCommand cmd = sqlConnection.CreateCommand();
+                cmd.CommandText = $"Insert into Role values" +
+                    $"('{role.RoleDescription}','{role.RoleName}','{role.CreatedDateTime}','{role.UpdatedDateTime}')";
+                var result = cmd.ExecuteNonQuery();
+                return result;
+            }
+            catch (Exception exception)
+            {
+                return -1;
+            }
+        }
 
+        //public int CreateRole(Role role)
+        //{
+        //    try
+        //    {
+        //        SqlConnection sqlConnection = new SqlConnection();
+        //        sqlConnection.ConnectionString = DatabaseConnectionString;
+        //        sqlConnection.Open();
+        //        SqlCommand cmd = sqlConnection.CreateCommand();
+        //        cmd.CommandText = $"Insert into Role1 values" +
+        //            $"('{role.RoleName}')";
+        //        var result = cmd.ExecuteNonQuery();
+        //        return result;
+        //    }
+        //    catch (Exception exception)
+        //    {
+        //        return -1;
+        //    }
+        //}
+        public List<Role> GetRole(int Roleid)
+        {
+            try
+            {
+                SqlConnection sqlConnection = new SqlConnection();
+                sqlConnection.ConnectionString = DatabaseConnectionString;
+                sqlConnection.Open();
+                SqlCommand sqlCommand = sqlConnection.CreateCommand();
+                sqlCommand.CommandText = $"select * from role where role_id={Roleid}";
+                SqlDataReader result = sqlCommand.ExecuteReader();
+                List<Role> logrole = new List<Role>();
+                while (result.Read())
+                {
+                    Role roles = new Role();
+                    roles.Roleid = result.GetInt32(0);
+                    roles.RoleDescription = result.GetString(1);
+                    roles.RoleName = result.GetString(2);
+                    roles.CreatedDateTime = result.GetDateTime(3);
+                    roles.UpdatedDateTime = result.GetDateTime(4);
+                    logrole.Add(roles);
+                }
+                result.Close();
+
+                return logrole;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public int UpdateRole(Role role)
+        {
+            try
+            {
+                SqlConnection sqlConnection = new SqlConnection();
+                sqlConnection.ConnectionString = DatabaseConnectionString;
+                sqlConnection.Open();
+                SqlCommand sqlCommand = sqlConnection.CreateCommand();
+
+                sqlCommand.CommandText = $"update role set role_description='{role.RoleDescription}'," +
+                    $"role_name='{role.RoleName}'," +
+                    $"created_datetime='{role.CreatedDateTime}'," +
+                    $"updated_datetime='{role.UpdatedDateTime}'" +
+                    $" where role_id={role.Roleid}";
+
+                var updatedRecordCount = sqlCommand.ExecuteNonQuery();
+                return updatedRecordCount;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public int DeleteRole(int Roleid)
+        {
+            try
+            {
+                SqlConnection sqlConnection = new SqlConnection();
+                sqlConnection.ConnectionString = DatabaseConnectionString;
+                sqlConnection.Open();
+                SqlCommand sqlCommand = sqlConnection.CreateCommand();
+                sqlCommand.CommandText = $"Delete from role where role_id='{Roleid}'";
+                var var = sqlCommand.ExecuteNonQuery();
+                return var;
+            }
+            catch (Exception exception)
+            {
+                return 0;
+            }
+
+        }
+    }
 }
